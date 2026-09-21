@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SP · MG · ES — Concreto, Ouro e Maré</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B0B0E;
+    --sand:#F3E7D2;
+    --line: rgba(255,255,255,0.14);
+    --shadow-hard: 6px 6px 0 rgba(0,0,0,0.85);
+    --font-display:'Bebas Neue', sans-serif;
+    --font-body:'Sora', sans-serif;
+
+    /* SP */
+    --sp-bg:#17171B; --sp-bg2:#1E1E24; --sp-pink:#FF2E92; --sp-cyan:#00E5FF; --sp-yellow:#FFD400;
+    /* MG */
+    --mg-bg:#F4E9D3; --mg-ink:#33231A; --mg-terra:#B5601D; --mg-gold:#C9962B; --mg-green:#3F6E52;
+    /* ES */
+    --es-bg:#082B36; --es-bg2:#0C3745; --es-teal:#1FB3A8; --es-sand:#EFE0C3; --es-terra:#C1622B;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; font-family:var(--font-body); background:var(--sp-bg); color:var(--sand); overflow-x:hidden;}
+  ::selection{background:var(--sp-pink); color:#fff;}
+  h1,h2,h3,.display{font-family:var(--font-display); letter-spacing:0.01em; line-height:0.92; margin:0; font-weight:400;}
+  a{color:inherit;} button{font-family:var(--font-body); cursor:pointer;} p{margin:0;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
+  a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible{outline:3px solid var(--sp-yellow); outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;} }
+
+  .nav{position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:18px 32px; background:linear-gradient(to bottom, rgba(11,11,14,0.9), rgba(11,11,14,0)); pointer-events:none;}
+  .nav *{pointer-events:auto;}
+  .nav .logo{font-family:var(--font-display); font-size:22px; letter-spacing:0.04em;}
+  .nav .logo span{color:var(--sp-yellow);}
+  .nav ul{list-style:none; display:flex; gap:24px; margin:0; padding:0;}
+  .nav a{text-decoration:none; font-size:14px; font-weight:700; color:var(--sand); opacity:0.85; padding-bottom:3px; border-bottom:2px solid transparent; transition:opacity .2s, border-color .2s;}
+  .nav a:hover{opacity:1; border-color:var(--sp-yellow);}
+  .nav-toggle{display:none; background:none; border:2px solid var(--sand); color:var(--sand); border-radius:6px; padding:6px 10px;}
+  @media (max-width:820px){
+    .nav ul{position:absolute; top:60px; right:20px; left:20px; flex-direction:column; background:#1E1E24; border:2px solid var(--line); border-radius:12px; padding:18px; display:none; box-shadow:var(--shadow-hard);}
+    .nav ul.open{display:flex;} .nav-toggle{display:block;}
+  }
+
+  /* ===== HERO ===== */
+  .hero{position:relative; min-height:100svh; display:flex; align-items:flex-end; overflow:hidden; background:radial-gradient(120% 90% at 50% -10%, #2a2a33 0%, var(--sp-bg) 55%, #0a0a0c 100%);}
+  #spray-canvas{position:absolute; inset:0; width:100%; height:100%; z-index:1;}
+  .hero-skyline{position:absolute; inset:0; z-index:2; pointer-events:none; display:flex; align-items:flex-end;}
+  .hero-skyline svg{width:33.4%; height:auto; display:block;}
+  .hero-content{position:relative; z-index:3; width:100%; padding:0 32px 8vh; text-align:center;}
+  .hero-eyebrow{font-size:14px; font-weight:700; color:var(--sp-cyan); margin-bottom:10px;}
+  .hero h1{font-size:clamp(52px, 12vw, 130px); color:var(--sand);}
+  .hero h1 .dot{color:var(--sp-yellow);}
+  .hero p{max-width:560px; margin:20px auto 0; font-size:17px; line-height:1.6; color:rgba(243,231,210,0.85);}
+  .hero-actions{margin-top:34px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap;}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:14px 26px; border-radius:999px; border:2px solid transparent; font-weight:700; font-size:15px; text-decoration:none; transition:transform .15s ease;}
+  .btn:active{transform:scale(0.96);}
+  .btn-primary{background:var(--sp-pink); color:#fff; box-shadow:0 10px 30px -10px rgba(255,46,146,0.6);}
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-ghost{background:transparent; border-color:var(--sand); color:var(--sand);}
+  .btn-ghost:hover{background:rgba(243,231,210,0.08);}
+  .scroll-cue{position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:3; font-size:12px; letter-spacing:0.08em; color:rgba(243,231,210,0.6); display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .scroll-cue .dash{width:2px; height:26px; background:var(--sand); opacity:0.5; animation:scrollpulse 1.8s ease-in-out infinite;}
+  @keyframes scrollpulse{0%,100%{transform:scaleY(1); opacity:0.5;} 50%{transform:scaleY(0.4); opacity:0.9;}}
+
+  /* ===== SECTION SHELL ===== */
+  section{position:relative; padding:110px 0;}
+  .section-head{display:flex; align-items:flex-end; justify-content:space-between; gap:40px; flex-wrap:wrap; margin-bottom:40px;}
+  .section-head h2{font-size:clamp(38px, 5.6vw, 72px);}
+  .section-head .lede{max-width:380px; font-size:15px; line-height:1.7; opacity:0.85;}
+  .kicker{font-size:13px; font-weight:700; margin-bottom:8px; display:block;}
+  .intro-text{max-width:760px; font-size:15.5px; line-height:1.75; opacity:0.9; margin-bottom:48px;}
+  .intro-text strong{font-weight:700;}
+
+  .sp-section{background:var(--sp-bg); color:var(--sand);}
+  .sp-section .kicker{color:var(--sp-yellow);}
+  .sp-section .intro-text strong{color:var(--sp-cyan);}
+
+  .mg-section{background:var(--mg-bg); color:var(--mg-ink);}
+  .mg-section .kicker{color:var(--mg-terra);}
+  .mg-section .intro-text strong{color:var(--mg-terra);}
+
+  .es-section{background:var(--es-bg); color:var(--es-sand);}
+  .es-section .kicker{color:var(--es-teal);}
+  .es-section .intro-text strong{color:var(--es-teal);}
+
+  /* ===== SP: GRAFITE WALL ===== */
+  .panel{border-radius:20px; padding:28px; box-shadow:var(--shadow-hard); border:2px solid var(--line);}
+  .sp-panel{background:var(--sp-bg2);}
+  .wall-wrap{display:grid; grid-template-columns:1fr 1.2fr; gap:56px; align-items:start; margin-bottom:70px;}
+  @media (max-width:900px){ .wall-wrap{grid-template-columns:1fr;} }
+  #graffiti-canvas{width:100%; aspect-ratio:4/3; border-radius:14px; cursor:crosshair; display:block; touch-action:none; background:#232329;}
+  .paint-controls{display:flex; align-items:center; gap:12px; margin-top:16px; flex-wrap:wrap;}
+  .swatch{width:30px; height:30px; border-radius:50%; border:2px solid rgba(255,255,255,0.5); flex-shrink:0;}
+  .swatch.active{outline:3px solid #fff; outline-offset:2px;}
+  .paint-controls button.small{background:var(--sand); color:var(--ink); border:none; padding:9px 16px; border-radius:999px; font-size:12px; font-weight:700; margin-left:auto;}
+  .paint-controls button.small:hover{background:var(--sp-yellow);}
+  .paint-hint{font-size:12.5px; opacity:0.65; margin-top:12px; line-height:1.5;}
+
+  .fact-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:18px;}
+  .fact-list li{display:flex; gap:14px; font-size:14px; line-height:1.6; opacity:0.9;}
+  .fact-list .num{font-family:var(--font-display); font-size:26px; flex-shrink:0; width:38px;}
+  .sp-section .fact-list .num{color:var(--sp-pink);}
+  .mg-section .fact-list .num{color:var(--mg-terra);}
+  .es-section .fact-list .num{color:var(--es-teal);}
+
+  /* ===== BEAT SEQUENCER (compartilhado) ===== */
+  .transport{display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:28px; padding-bottom:24px; border-bottom:1px solid var(--line);}
+  .play-btn{width:56px; height:56px; border-radius:50%; background:var(--sp-pink); border:none; color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; box-shadow:0 8px 20px -6px rgba(255,46,146,0.6);}
+  .play-btn:hover{filter:brightness(1.08);}
+  .tempo-control{display:flex; align-items:center; gap:12px; font-size:13px; color:rgba(243,231,210,0.8);}
+  .tempo-control input[type=range]{accent-color:var(--sp-yellow); width:140px;}
+  .clear-btn{margin-left:auto; background:none; border:1px solid var(--line); color:var(--sand); padding:9px 16px; border-radius:999px; font-size:13px; font-weight:600;}
+  .clear-btn:hover{border-color:var(--sp-yellow); color:var(--sp-yellow);}
+  .sequencer{display:flex; flex-direction:column; gap:10px;}
+  .instrument-row{display:grid; grid-template-columns:110px repeat(8, 1fr); gap:8px; align-items:center;}
+  .instrument-name{font-size:13px; font-weight:700; color:var(--sand); opacity:0.85;}
+  .instrument-name small{display:block; font-weight:400; opacity:0.6; font-size:11px;}
+  .cell{aspect-ratio:1/1; border-radius:8px; background:rgba(243,231,210,0.06); border:1px solid var(--line); transition:transform .08s ease, background .15s ease;}
+  .cell:hover{background:rgba(243,231,210,0.14);}
+  .cell.on{background:var(--inst-color, var(--sp-yellow)); border-color:transparent;}
+  .cell.playhead{transform:scale(1.12); box-shadow:0 0 0 2px var(--sand);}
+  .beat-grid{display:grid; grid-template-columns:1fr 1.3fr; gap:60px; align-items:start;}
+  @media (max-width:900px){ .beat-grid{grid-template-columns:1fr;} .instrument-row{grid-template-columns:88px repeat(8,1fr); gap:6px;} }
+
+  /* ===== MG: MONTE SEU PRATO ===== */
+  .plate-wrap{display:grid; grid-template-columns:1fr 1.2fr; gap:56px; align-items:center; margin-bottom:70px;}
+  @media (max-width:900px){ .plate-wrap{grid-template-columns:1fr;} }
+  .plate-card{background:#fff; border:2px solid var(--mg-ink); border-radius:50%; aspect-ratio:1/1; box-shadow:8px 8px 0 rgba(51,35,26,0.15); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;}
+  .plate-inner{position:relative; width:82%; height:82%; border-radius:50%; border:3px dashed rgba(51,35,26,0.15);}
+  .food-item{position:absolute; font-size:44px; opacity:0.12; filter:grayscale(1); transition:opacity .25s ease, filter .25s ease, transform .25s ease; transform:scale(0.85);}
+  .food-item.active{opacity:1; filter:none; transform:scale(1);}
+  .plate-counter{position:absolute; bottom:10px; left:50%; transform:translateX(-50%); font-size:12px; font-weight:700; background:var(--mg-ink); color:var(--mg-bg); padding:6px 14px; border-radius:999px;}
+  .ingredient-list{display:flex; flex-wrap:wrap; gap:10px;}
+  .ingredient-chip{display:flex; align-items:center; gap:8px; background:#fff; border:2px solid var(--mg-ink); border-radius:999px; padding:9px 16px 9px 10px; font-size:13px; font-weight:700; color:var(--mg-ink);}
+  .ingredient-chip .ico{font-size:18px;}
+  .ingredient-chip.active{background:var(--mg-terra); color:#fff; border-color:var(--mg-terra);}
+  .ingredient-chip:hover{border-color:var(--mg-terra);}
+  .mg-note{margin-top:18px; font-size:13px; opacity:0.75; line-height:1.6;}
+
+  /* ===== FLIP CARDS (compartilhado) ===== */
+  .flip-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:22px;}
+  .flip-card{perspective:1200px; height:290px;}
+  .flip-card-inner{position:relative; width:100%; height:100%; transition:transform 0.6s cubic-bezier(.2,.8,.2,1); transform-style:preserve-3d;}
+  .flip-card.flipped .flip-card-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:16px; border:2px solid rgba(0,0,0,0.1); display:flex; flex-direction:column; overflow:hidden;}
+  .flip-front{justify-content:space-between; padding:18px;}
+  .flip-front .emoji{font-size:56px; line-height:1;}
+  .flip-front h3{font-size:24px; margin-top:8px;}
+  .flip-front .tap-hint{font-size:11px; opacity:0.55; font-weight:600;}
+  .flip-back{transform:rotateY(180deg); padding:22px; justify-content:center; font-size:13.5px; line-height:1.6; font-weight:500;}
+  .flip-back strong{font-family:var(--font-display); display:block; font-size:19px; margin-bottom:8px; letter-spacing:0.02em;}
+
+  /* ===== ES: LITORAL / SERRA ===== */
+  .es-toggle-wrap{display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start; margin-bottom:70px;}
+  @media (max-width:900px){ .es-toggle-wrap{grid-template-columns:1fr;} }
+  .scene-card{border-radius:20px; overflow:hidden; border:2px solid rgba(255,255,255,0.2); box-shadow:8px 8px 0 rgba(0,0,0,0.3);}
+  #scene-canvas{display:block; width:100%; height:auto;}
+  .toggle-row{display:flex; gap:12px; margin-top:18px;}
+  .toggle-btn{flex:1; padding:12px; border-radius:12px; border:2px solid var(--es-teal); background:transparent; color:var(--es-sand); font-weight:700; font-size:14px;}
+  .toggle-btn.active{background:var(--es-teal); color:var(--es-bg);}
+  .es-caption{margin-top:16px; font-size:14px; line-height:1.7; opacity:0.85;}
+
+  footer{background:#0a0a0c; padding:60px 0 34px; text-align:center; font-size:13px; color:rgba(243,231,210,0.6);}
+  footer .display{font-size:30px; color:var(--sand); margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">SUD<span>.</span>ESTE</div>
+  <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+  <ul id="navMenu">
+    <li><a href="#sp">São Paulo</a></li>
+    <li><a href="#mg">Minas Gerais</a></li>
+    <li><a href="#es">Espírito Santo</a></li>
+  </ul>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="hero">
+  <canvas id="spray-canvas"></canvas>
+  <div class="hero-skyline">
+    <svg viewBox="0 0 200 260" preserveAspectRatio="xMidYMax meet">
+      <rect x="20" y="140" width="26" height="120" fill="#0e0e12"/>
+      <rect x="52" y="100" width="20" height="160" fill="#0e0e12"/>
+      <rect x="78" y="160" width="30" height="100" fill="#0e0e12"/>
+      <rect x="114" y="70" width="22" height="190" fill="#0e0e12"/>
+      <rect x="142" y="130" width="34" height="130" fill="#0e0e12"/>
+      <rect x="60" y="60" width="4" height="30" fill="#0e0e12"/>
+    </svg>
+    <svg viewBox="0 0 200 260" preserveAspectRatio="xMidYMax meet">
+      <path d="M0,260 L0,190 Q50,110 100,190 Q140,140 200,190 L200,260 Z" fill="#22180f"/>
+      <rect x="92" y="120" width="16" height="70" fill="#160f09"/>
+      <path d="M92,120 L100,95 L108,120 Z" fill="#160f09"/>
+    </svg>
+    <svg viewBox="0 0 200 260" preserveAspectRatio="xMidYMax meet">
+      <rect x="0" y="210" width="200" height="50" fill="#06222b"/>
+      <path d="M30,210 Q40,150 50,210 M46,180 Q54,175 60,182" stroke="#06222b" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M150,210 Q160,160 170,210 M166,188 Q174,183 180,190" stroke="#06222b" stroke-width="6" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <span class="hero-eyebrow">TRÊS ESTADOS, UMA REGIÃO</span>
+    <h1>SP <span class="dot">·</span> MG <span class="dot">·</span> ES</h1>
+    <p>Parede pichada, prato farto e panela de barro. Um passeio interativo por São Paulo, Minas Gerais e Espírito Santo — clica, arrasta e lê um pouco da história de cada um.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" id="heroSprayBtn">Spray na parede 🎨</button>
+      <a class="btn btn-ghost" href="#sp">Começar ↓</a>
+    </div>
+  </div>
+  <div class="scroll-cue"><span class="dash"></span>role</div>
+</header>
+
+<!-- ============ SÃO PAULO ============ -->
+<section id="sp" class="sp-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">01 — CONCRETO E VOZ DA PERIFERIA</span>
+        <h2>São Paulo:<br>parede e microfone</h2>
+      </div>
+      <p class="lede">Pinte a parede e monte uma batida — dois jeitos de sentir a cena de rua paulistana.</p>
+    </div>
+
+    <p class="intro-text">São Paulo é uma cidade de concreto, mas suas paredes contam histórias. Nos anos 1980 surgiu a <strong>pixação</strong>, um jeito de escrever com letras altas e pontudas, criado por jovens da periferia — um estilo que não existe em nenhum outro lugar do mundo. Do lado dela cresceu o <strong>grafite</strong> colorido, com murais e personagens, que transformou o Beco do Batman, na Vila Madalena, em point turístico; artistas como Eduardo Kobra pintam painéis gigantes hoje conhecidos até fora do Brasil. Foi nesse mesmo cenário de periferia que nasceu o <strong>rap paulistano</strong>: os Racionais MC's colocaram em música a vida dura da Zona Sul e viraram um dos discos mais importantes da música brasileira com "Sobrevivendo no Inferno" (1997). Hoje, saraus e slams de poesia, como o Slam da Guilhermina, na Zona Leste, continuam levando a voz da periferia pro microfone.</p>
+
+    <div class="wall-wrap">
+      <div>
+        <ul class="fact-list">
+          <li><span class="num">01</span><span><strong>Pixação</strong> — letras altas e retas, feitas rápido e em lugares difíceis de alcançar; é sobre coragem e assinatura, não sobre cor.</span></li>
+          <li><span class="num">02</span><span><strong>Grafite</strong> — cores, personagens e mensagens; nasceu do hip-hop e virou arte de galeria e de rua ao mesmo tempo.</span></li>
+          <li><span class="num">03</span><span><strong>Rap</strong> — batida, sample e palavra; contar a própria história em cima do beat.</span></li>
+          <li><span class="num">04</span><span><strong>Slam</strong> — poesia falada, sem música, disputada ao vivo diante do público.</span></li>
+        </ul>
+      </div>
+      <div class="panel sp-panel">
+        <canvas id="graffiti-canvas" width="480" height="360"></canvas>
+        <div class="paint-controls">
+          <button class="swatch active" data-color="#FF2E92" style="background:#FF2E92"></button>
+          <button class="swatch" data-color="#00E5FF" style="background:#00E5FF"></button>
+          <button class="swatch" data-color="#FFD400" style="background:#FFD400"></button>
+          <button class="swatch" data-color="#FFFFFF" style="background:#FFFFFF"></button>
+          <button class="swatch" data-color="#8B5CF6" style="background:#8B5CF6"></button>
+          <button class="small" id="clearWall">Limpar parede</button>
+        </div>
+        <p class="paint-hint">Clique ou arraste no muro pra pichar/grafitar com spray — escolha a cor acima.</p>
+      </div>
+    </div>
+
+    <div class="panel sp-panel">
+      <div class="transport">
+        <button class="play-btn" id="beatPlayBtn" aria-label="Tocar batida">▶</button>
+        <div class="tempo-control">
+          <span>Batida</span>
+          <input type="range" id="beatTempo" min="80" max="105" value="90">
+          <span id="beatTempoValue">90 bpm</span>
+        </div>
+        <button class="clear-btn" id="beatClearBtn">Limpar tudo</button>
+      </div>
+      <div class="sequencer" id="beatSequencer"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MINAS GERAIS ============ -->
+<section id="mg" class="mg-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">02 — FOGÃO A LENHA E BARROCO</span>
+        <h2>Minas Gerais:<br>sabor e história</h2>
+      </div>
+      <p class="lede">Monte seu prato mineiro clicando nos ingredientes e conheça um pouco da história das cidades históricas do estado.</p>
+    </div>
+
+    <p class="intro-text">Minas Gerais nasceu do ouro. No século 18, milhares de pessoas chegaram atrás das minas de Ouro Preto e Mariana, e com elas vieram igrejas cheias de talha dourada e esculturas de <strong>Aleijadinho</strong>, um dos maiores artistas do Brasil colonial. Ouro Preto é hoje Patrimônio Mundial da UNESCO, e foi lá que aconteceu a <strong>Inconfidência Mineira</strong>, em 1789 — uma das primeiras tentativas de libertar o Brasil de Portugal. Mas Minas também é conhecida pela mesa farta: a comida mineira nasceu da vida dos tropeiros, viajantes que cruzavam o estado a cavalo levando mercadorias, por isso é uma comida de fogão a lenha, feita pra alimentar bem. Não é à toa que existe um ditado: <strong>"em Minas, sempre cabe mais um prato na mesa."</strong></p>
+
+    <div class="plate-wrap">
+      <div class="plate-card">
+        <div class="plate-inner" id="plateInner"></div>
+        <span class="plate-counter" id="plateCounter">0 itens no prato</span>
+      </div>
+      <div>
+        <div class="ingredient-list" id="ingredientList"></div>
+        <p class="mg-note">Cada clique adiciona (ou tira) um item típico do prato mineiro — de comfort food a doce de sobremesa.</p>
+      </div>
+    </div>
+
+    <div class="flip-grid" id="mgGrid">
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front" style="background:#fff;">
+            <span class="emoji">⛪</span>
+            <h3>Ouro Preto</h3>
+            <span class="tap-hint">toque para ler ↺</span>
+          </div>
+          <div class="flip-face flip-back" style="background:var(--mg-gold); color:#2b1b12;">
+            <strong>Patrimônio Mundial · 1980</strong>
+            Antiga capital de Minas, cheia de igrejas barrocas e ruas de pedra. Foi a primeira cidade brasileira reconhecida pela UNESCO como Patrimônio da Humanidade.
+          </div>
+        </div>
+      </div>
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front" style="background:#fff;">
+            <span class="emoji">🗡️</span>
+            <h3>Inconfidência Mineira</h3>
+            <span class="tap-hint">toque para ler ↺</span>
+          </div>
+          <div class="flip-face flip-back" style="background:var(--mg-terra); color:#fff;">
+            <strong>1789 · Ouro Preto</strong>
+            Um grupo de mineiros, entre eles Tiradentes, planejou libertar o Brasil de Portugal e criar uma república. O plano foi descoberto e Tiradentes foi executado em 1792 — hoje é herói nacional.
+          </div>
+        </div>
+      </div>
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front" style="background:#fff;">
+            <span class="emoji">🪵</span>
+            <h3>Aleijadinho</h3>
+            <span class="tap-hint">toque para ler ↺</span>
+          </div>
+          <div class="flip-face flip-back" style="background:var(--mg-green); color:#fff;">
+            <strong>1738–1814</strong>
+            Antônio Francisco Lisboa esculpiu santos e fachadas de igrejas por toda Minas, mesmo depois de perder o movimento das mãos. É considerado o maior nome da arte barroca brasileira.
+          </div>
+        </div>
+      </div>
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front" style="background:#fff;">
+            <span class="emoji">🥁</span>
+            <h3>Congado</h3>
+            <span class="tap-hint">toque para ler ↺</span>
+          </div>
+          <div class="flip-face flip-back" style="background:#33231A; color:var(--mg-bg);">
+            <strong>Tradição afro-mineira</strong>
+            Festa que mistura fé católica e raízes africanas, com ternos de congo, tambores e coroação de reis e rainhas — celebrada em cidades mineiras há mais de 200 anos.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ESPÍRITO SANTO ============ -->
+<section id="es" class="es-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker">03 — MAR, SERRA E PANELA DE BARRO</span>
+        <h2>Espírito Santo:<br>costa e montanha</h2>
+      </div>
+      <p class="lede">Duas paisagens, um só estado. Alterne entre o litoral e a serra capixaba.</p>
+    </div>
+
+    <p class="intro-text">O Espírito Santo tem duas caras bem diferentes: o litoral, com praias como a de Camburi, e a serra, coberta de montanhas e cidades fundadas por imigrantes. No século 19, milhares de <strong>italianos e pomeranos</strong> (alemães vindos da região da Pomerânia) colonizaram o interior — hoje cidades como Domingos Martins e Santa Teresa ainda têm casas de <strong>enxaimel</strong>, construídas com vigas de madeira à mostra, um estilo trazido direto da Europa. Já na costa, a culinária tem outra herança: a <strong>moqueca capixaba</strong> é feita numa panela de barro, sem leite de coco e sem azeite de dendê — bem diferente da baiana —, temperada com urucum e cozida devagar. A panela é feita à mão pelas paneleiras de Goiabeiras, em Vitória, um ofício tão antigo que virou Patrimônio Cultural do Brasil.</p>
+
+    <div class="es-toggle-wrap">
+      <div>
+        <div class="scene-card">
+          <canvas id="scene-canvas" width="560" height="380"></canvas>
+        </div>
+        <div class="toggle-row">
+          <button class="toggle-btn active" id="btnLitoral">🌊 Litoral</button>
+          <button class="toggle-btn" id="btnSerra">⛰️ Serra</button>
+        </div>
+        <p class="es-caption" id="sceneCaption">O litoral capixaba mistura praias, o Convento da Penha (1558) no alto de um morro em Vila Velha, e coqueiros à beira-mar.</p>
+      </div>
+      <div>
+        <ul class="fact-list">
+          <li><span class="num">01</span><span><strong>Panela de barro</strong> — feita à mão pelas paneleiras de Goiabeiras, sem torno, com técnica indígena de mais de 400 anos.</span></li>
+          <li><span class="num">02</span><span><strong>Enxaimel</strong> — arquitetura de madeira trazida por imigrantes alemães e italianos, ainda de pé nas cidades serranas.</span></li>
+          <li><span class="num">03</span><span><strong>Convento da Penha</strong> — construído em 1558 no alto de um morro de granito em Vila Velha, um dos pontos mais visitados do estado.</span></li>
+          <li><span class="num">04</span><span><strong>Pedra Azul</strong> — formação rochosa gigante na serra, que muda de cor conforme a luz do dia.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="display">Três estados, muitas camadas.</div>
+    <p>Feito com HTML, CSS e JavaScript puros — os sons da batida são sintetizados ao vivo pela Web Audio API, sem nenhum arquivo de áudio.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var navToggle = document.getElementById('navToggle');
+  var navMenu = document.getElementById('navMenu');
+  navToggle.addEventListener('click', function(){
+    var open = navMenu.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true':'false');
+  });
+  navMenu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navMenu.classList.remove('open'); });
+  });
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============ HERO SPRAY PARTICLES ============ */
+  var canvas = document.getElementById('spray-canvas');
+  var ctx = canvas.getContext('2d');
+  var hero = document.getElementById('hero');
+  var drips = [];
+  var sprayColors = ['#FF2E92','#00E5FF','#FFD400','#8B5CF6','#FFFFFF'];
+
+  function resizeCanvas(){ canvas.width = hero.clientWidth; canvas.height = hero.clientHeight; }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function spawnSpray(x, y, count){
+    for(var i=0;i<count;i++){
+      var angle = Math.random()*Math.PI*2;
+      var speed = Math.random()*5+1;
+      drips.push({
+        x:x, y:y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed - 2,
+        size:2+Math.random()*4, color:sprayColors[Math.floor(Math.random()*sprayColors.length)], life:0
+      });
+    }
+  }
+  function tickSpray(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drips.forEach(function(p){
+      p.vy += 0.12; p.x += p.vx; p.y += p.vy; p.life++;
+      ctx.globalAlpha = Math.max(0, 1 - p.life/90);
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    drips = drips.filter(function(p){ return p.life < 90 && p.y < canvas.height+40; });
+    requestAnimationFrame(tickSpray);
+  }
+  if(!reduceMotion){ requestAnimationFrame(tickSpray); } else { ctx.clearRect(0,0,canvas.width,canvas.height); }
+
+  document.getElementById('heroSprayBtn').addEventListener('click', function(){
+    var rect = canvas.getBoundingClientRect();
+    spawnSpray(rect.width/2, rect.height*0.35, reduceMotion?0:70);
+  });
+  hero.addEventListener('click', function(e){
+    if(e.target.closest('button, a')) return;
+    var rect = canvas.getBoundingClientRect();
+    spawnSpray(e.clientX-rect.left, e.clientY-rect.top, reduceMotion?0:35);
+  });
+  window.addEventListener('load', function(){ if(!reduceMotion){ spawnSpray(canvas.width/2, canvas.height*0.3, 50); } });
+
+  /* ============ AUDIO ENGINE ============ */
+  var audioCtx = null;
+  function ensureAudio(){
+    if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+  }
+  function noiseBuffer(duration){
+    var bufferSize = audioCtx.sampleRate * duration;
+    var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for(var i=0;i<bufferSize;i++){ data[i] = Math.random()*2-1; }
+    return buffer;
+  }
+  function playKick(t){
+    var osc = audioCtx.createOscillator(); var gain = audioCtx.createGain();
+    osc.type='sine'; osc.frequency.setValueAtTime(140,t); osc.frequency.exponentialRampToValueAtTime(45,t+0.22);
+    gain.gain.setValueAtTime(1,t); gain.gain.exponentialRampToValueAtTime(0.001,t+0.28);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.3);
+  }
+  function playSnare(t){
+    var src = audioCtx.createBufferSource(); src.buffer = noiseBuffer(0.2);
+    var bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1600; bp.Q.value=0.9;
+    var gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.55,t); gain.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+    src.connect(bp); bp.connect(gain); gain.connect(audioCtx.destination); src.start(t);
+    var osc = audioCtx.createOscillator(); var g2 = audioCtx.createGain();
+    osc.type='triangle'; osc.frequency.setValueAtTime(190,t);
+    g2.gain.setValueAtTime(0.3,t); g2.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+    osc.connect(g2); g2.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.12);
+  }
+  function playHat(t, open){
+    var src = audioCtx.createBufferSource(); src.buffer = noiseBuffer(open?0.22:0.06);
+    var hp = audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=7000;
+    var gain = audioCtx.createGain(); gain.gain.setValueAtTime(open?0.18:0.22,t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t+(open?0.2:0.05));
+    src.connect(hp); hp.connect(gain); gain.connect(audioCtx.destination); src.start(t);
+  }
+  function playScratch(t){
+    var osc = audioCtx.createOscillator(); var gain = audioCtx.createGain();
+    osc.type='sawtooth';
+    osc.frequency.setValueAtTime(300,t);
+    osc.frequency.linearRampToValueAtTime(900,t+0.06);
+    osc.frequency.linearRampToValueAtTime(150,t+0.13);
+    gain.gain.setValueAtTime(0.001,t); gain.gain.linearRampToValueAtTime(0.28,t+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.16);
+  }
+
+  /* ============ BEAT SEQUENCER ============ */
+  var beatInstruments = [
+    {name:'Kick', sub:'grave · fundação', color:'#FF2E92', fn:function(t){playKick(t);}, steps:[1,0,0,0,1,0,0,0]},
+    {name:'Snare', sub:'contratempo', color:'#00E5FF', fn:function(t){playSnare(t);}, steps:[0,0,1,0,0,0,1,0]},
+    {name:'Hi-Hat', sub:'fechado', color:'#FFD400', fn:function(t){playHat(t,false);}, steps:[1,1,1,1,1,1,1,1]},
+    {name:'Scratch', sub:'efeito de DJ', color:'#8B5CF6', fn:function(t){playScratch(t);}, steps:[0,0,0,1,0,0,0,0]}
+  ];
+  var beatSeqEl = document.getElementById('beatSequencer');
+  beatInstruments.forEach(function(inst, rowIndex){
+    var row = document.createElement('div'); row.className='instrument-row';
+    var label = document.createElement('div'); label.className='instrument-name';
+    label.innerHTML = inst.name + '<small>'+inst.sub+'</small>';
+    row.appendChild(label);
+    for(var i=0;i<8;i++){
+      var cell = document.createElement('button');
+      cell.className = 'cell'+(inst.steps[i] ? ' on':'');
+      cell.style.setProperty('--inst-color', inst.color);
+      cell.setAttribute('data-row', rowIndex); cell.setAttribute('data-step', i);
+      cell.setAttribute('aria-label', inst.name+' passo '+(i+1));
+      cell.addEventListener('click', function(){
+        var r=+this.getAttribute('data-row'), s=+this.getAttribute('data-step');
+        beatInstruments[r].steps[s] = beatInstruments[r].steps[s] ? 0 : 1;
+        this.classList.toggle('on');
+      });
+      row.appendChild(cell);
+    }
+    beatSeqEl.appendChild(row);
+  });
+  document.getElementById('beatClearBtn').addEventListener('click', function(){
+    beatInstruments.forEach(function(inst){ inst.steps = inst.steps.map(function(){return 0;}); });
+    beatSeqEl.querySelectorAll('.cell').forEach(function(c){ c.classList.remove('on'); });
+  });
+
+  var beatPlaying=false, beatStep=0, beatNextTime=0, beatTimerID=null, beatBpm=90;
+  function beatScheduler(){
+    while(beatNextTime < audioCtx.currentTime + 0.1){
+      beatInstruments.forEach(function(inst){ if(inst.steps[beatStep]) inst.fn(beatNextTime); });
+      (function(step, time){
+        var delay=(time-audioCtx.currentTime)*1000;
+        setTimeout(function(){ beatHighlight(step); }, Math.max(delay,0));
+      })(beatStep, beatNextTime);
+      beatNextTime += 60.0/beatBpm/2;
+      beatStep = (beatStep+1)%8;
+    }
+    beatTimerID = setTimeout(beatScheduler, 25);
+  }
+  function beatHighlight(step){
+    beatSeqEl.querySelectorAll('.cell').forEach(function(c){ c.classList.remove('playhead'); });
+    if(beatPlaying){ beatSeqEl.querySelectorAll('.cell[data-step="'+step+'"]').forEach(function(c){ c.classList.add('playhead'); }); }
+  }
+  var beatPlayBtn = document.getElementById('beatPlayBtn');
+  beatPlayBtn.addEventListener('click', function(){
+    ensureAudio();
+    if(beatPlaying){
+      beatPlaying=false; clearTimeout(beatTimerID); beatPlayBtn.textContent='▶';
+      beatSeqEl.querySelectorAll('.cell').forEach(function(c){ c.classList.remove('playhead'); });
+    } else {
+      beatPlaying=true; beatStep=0; beatNextTime=audioCtx.currentTime+0.05;
+      beatPlayBtn.textContent='❚❚'; beatScheduler();
+    }
+  });
+  var beatTempo = document.getElementById('beatTempo');
+  var beatTempoValue = document.getElementById('beatTempoValue');
+  beatTempo.addEventListener('input', function(){ beatBpm=+this.value; beatTempoValue.textContent=beatBpm+' bpm'; });
+
+  /* ============ GRAFFITI CANVAS ============ */
+  var wallCanvas = document.getElementById('graffiti-canvas');
+  var wCtx = wallCanvas.getContext('2d');
+  var wallColor = '#FF2E92';
+  function resizeWall(){
+    var displayWidth = wallCanvas.clientWidth;
+    var prevData = null;
+    try{ prevData = wCtx.getImageData(0,0,wallCanvas.width, wallCanvas.height); }catch(e){}
+    wallCanvas.width = displayWidth; wallCanvas.height = displayWidth/(4/3);
+    wCtx.fillStyle = '#232329'; wCtx.fillRect(0,0,wallCanvas.width, wallCanvas.height);
+  }
+  window.addEventListener('resize', resizeWall);
+  setTimeout(resizeWall, 50);
+  wCtx.fillStyle = '#232329'; wCtx.fillRect(0,0,wallCanvas.width, wallCanvas.height);
+
+  function sprayAt(clientX, clientY){
+    var rect = wallCanvas.getBoundingClientRect();
+    var cx = clientX-rect.left, cy = clientY-rect.top;
+    for(var i=0;i<14;i++){
+      var angle = Math.random()*Math.PI*2;
+      var r = Math.random()*16;
+      var x = cx + Math.cos(angle)*r, y = cy + Math.sin(angle)*r;
+      wCtx.globalAlpha = 0.35 + Math.random()*0.3;
+      wCtx.fillStyle = wallColor;
+      wCtx.beginPath(); wCtx.arc(x,y, 0.6+Math.random()*1.6, 0, Math.PI*2); wCtx.fill();
+    }
+    wCtx.globalAlpha = 1;
+  }
+  var wallPainting=false;
+  wallCanvas.addEventListener('mousedown', function(e){ wallPainting=true; sprayAt(e.clientX,e.clientY); });
+  window.addEventListener('mouseup', function(){ wallPainting=false; });
+  wallCanvas.addEventListener('mousemove', function(e){ if(wallPainting) sprayAt(e.clientX,e.clientY); });
+  wallCanvas.addEventListener('touchstart', function(e){ var t=e.touches[0]; sprayAt(t.clientX,t.clientY); }, {passive:true});
+  wallCanvas.addEventListener('touchmove', function(e){ var t=e.touches[0]; sprayAt(t.clientX,t.clientY); }, {passive:true});
+  document.querySelectorAll('.wall-wrap .swatch').forEach(function(sw){
+    sw.addEventListener('click', function(){
+      document.querySelectorAll('.wall-wrap .swatch').forEach(function(s){ s.classList.remove('active'); });
+      this.classList.add('active'); wallColor = this.getAttribute('data-color');
+    });
+  });
+  document.getElementById('clearWall').addEventListener('click', function(){
+    wCtx.fillStyle='#232329'; wCtx.fillRect(0,0,wallCanvas.width, wallCanvas.height);
+  });
+
+  /* ============ MG: MONTE SEU PRATO ============ */
+  var foods = [
+    {id:'pao', emoji:'🧀', name:'Pão de queijo', pos:{top:'8%', left:'42%'}},
+    {id:'feijao', emoji:'🫘', name:'Feijão tropeiro', pos:{top:'30%', left:'12%'}},
+    {id:'couve', emoji:'🥬', name:'Couve mineira', pos:{top:'55%', left:'8%'}},
+    {id:'torresmo', emoji:'🥓', name:'Torresmo', pos:{top:'70%', left:'30%'}},
+    {id:'queijo', emoji:'🧈', name:'Queijo Minas', pos:{top:'70%', left:'60%'}},
+    {id:'doce', emoji:'🍮', name:'Doce de leite', pos:{top:'50%', left:'78%'}},
+    {id:'frango', emoji:'🍗', name:'Frango com quiabo', pos:{top:'25%', left:'70%'}}
+  ];
+  var plateInner = document.getElementById('plateInner');
+  var ingredientList = document.getElementById('ingredientList');
+  var activeFoods = {};
+
+  foods.forEach(function(f){
+    var el = document.createElement('div');
+    el.className = 'food-item';
+    el.style.top = f.pos.top; el.style.left = f.pos.left;
+    el.textContent = f.emoji;
+    el.id = 'food-'+f.id;
+    plateInner.appendChild(el);
+
+    var chip = document.createElement('button');
+    chip.className = 'ingredient-chip';
+    chip.innerHTML = '<span class="ico">'+f.emoji+'</span>'+f.name;
+    chip.addEventListener('click', function(){
+      activeFoods[f.id] = !activeFoods[f.id];
+      chip.classList.toggle('active', activeFoods[f.id]);
+      document.getElementById('food-'+f.id).classList.toggle('active', activeFoods[f.id]);
+      updatePlateCounter();
+    });
+    ingredientList.appendChild(chip);
+  });
+  function updatePlateCounter(){
+    var count = Object.keys(activeFoods).filter(function(k){ return activeFoods[k]; }).length;
+    document.getElementById('plateCounter').textContent = count + (count===1 ? ' item no prato' : ' itens no prato');
+  }
+
+  /* ============ ES: LITORAL / SERRA ============ */
+  var sceneCanvas = document.getElementById('scene-canvas');
+  var sCtx = sceneCanvas.getContext('2d');
+  var currentScene = 'litoral';
+
+  function drawLitoral(){
+    var w=sceneCanvas.width, h=sceneCanvas.height;
+    var grad = sCtx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,'#8fd9e8'); grad.addColorStop(0.55,'#bfeef2'); grad.addColorStop(0.56,'#0f6e82'); grad.addColorStop(1,'#0a4a5c');
+    sCtx.fillStyle=grad; sCtx.fillRect(0,0,w,h);
+    // sun
+    sCtx.fillStyle='#FFD97A'; sCtx.beginPath(); sCtx.arc(w*0.78,h*0.22,34,0,Math.PI*2); sCtx.fill();
+    // hill + convent
+    sCtx.fillStyle='#2c4a3a';
+    sCtx.beginPath(); sCtx.moveTo(w*0.05,h*0.56); sCtx.quadraticCurveTo(w*0.22,h*0.28,w*0.4,h*0.56); sCtx.closePath(); sCtx.fill();
+    sCtx.fillStyle='#e8dcc4';
+    sCtx.fillRect(w*0.19,h*0.36,w*0.07,h*0.14);
+    sCtx.beginPath(); sCtx.moveTo(w*0.19,h*0.36); sCtx.lineTo(w*0.225,h*0.30); sCtx.lineTo(w*0.26,h*0.36); sCtx.closePath(); sCtx.fill();
+    // sand
+    sCtx.fillStyle='#EFE0C3'; sCtx.fillRect(0,h*0.82,w,h*0.18);
+    // coconut trees
+    function tree(x,y){
+      sCtx.strokeStyle='#5a3d22'; sCtx.lineWidth=6; sCtx.beginPath();
+      sCtx.moveTo(x,y); sCtx.quadraticCurveTo(x+10,y-40,x+4,y-78); sCtx.stroke();
+      sCtx.fillStyle='#2c6b3f';
+      for(var a=0;a<5;a++){
+        var ang = -Math.PI/2 + (a-2)*0.5;
+        sCtx.beginPath();
+        sCtx.ellipse(x+4+Math.cos(ang)*20, y-78+Math.sin(ang)*14, 22, 7, ang, 0, Math.PI*2);
+        sCtx.fill();
+      }
+    }
+    tree(w*0.62,h*0.82); tree(w*0.72,h*0.86);
+  }
+
+  function drawSerra(){
+    var w=sceneCanvas.width, h=sceneCanvas.height;
+    var grad = sCtx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,'#bfe3ef'); grad.addColorStop(1,'#e9f3e4');
+    sCtx.fillStyle=grad; sCtx.fillRect(0,0,w,h);
+    // Pedra Azul rock
+    sCtx.fillStyle='#8892a6';
+    sCtx.beginPath(); sCtx.moveTo(w*0.55,h*0.62); sCtx.lineTo(w*0.7,h*0.2); sCtx.lineTo(w*0.86,h*0.62); sCtx.closePath(); sCtx.fill();
+    sCtx.fillStyle='#a5aec0';
+    sCtx.beginPath(); sCtx.moveTo(w*0.62,h*0.62); sCtx.lineTo(w*0.7,h*0.32); sCtx.lineTo(w*0.78,h*0.62); sCtx.closePath(); sCtx.fill();
+    // green hills
+    sCtx.fillStyle='#4e7a4f';
+    sCtx.beginPath(); sCtx.moveTo(0,h*0.68); sCtx.quadraticCurveTo(w*0.25,h*0.5,w*0.5,h*0.68); sCtx.lineTo(w,h*0.6); sCtx.lineTo(w,h); sCtx.lineTo(0,h); sCtx.closePath(); sCtx.fill();
+    // enxaimel house
+    sCtx.fillStyle='#F1E6D2'; sCtx.fillRect(w*0.14,h*0.62,w*0.22,h*0.2);
+    sCtx.fillStyle='#7a4a2a'; sCtx.fillRect(w*0.14,h*0.62,w*0.22,4);
+    sCtx.fillRect(w*0.14,h*0.62,4,h*0.2); sCtx.fillRect(w*0.14+w*0.22-4,h*0.62,4,h*0.2);
+    sCtx.fillRect(w*0.14+w*0.1,h*0.62,4,h*0.2);
+    sCtx.beginPath(); sCtx.moveTo(w*0.12,h*0.62); sCtx.lineTo(w*0.25,h*0.46); sCtx.lineTo(w*0.38,h*0.62); sCtx.closePath();
+    sCtx.fillStyle='#8a3324'; sCtx.fill();
+    // pine trees
+    function pine(x,y,scale){
+      sCtx.fillStyle='#2f5a38';
+      for(var i=0;i<3;i++){
+        sCtx.beginPath();
+        sCtx.moveTo(x, y - i*18*scale - 10*scale);
+        sCtx.lineTo(x-16*scale, y - i*18*scale + 10*scale);
+        sCtx.lineTo(x+16*scale, y - i*18*scale + 10*scale);
+        sCtx.closePath(); sCtx.fill();
+      }
+    }
+    pine(w*0.06,h*0.7,1); pine(w*0.92,h*0.66,1.2);
+  }
+
+  function renderScene(){ currentScene === 'litoral' ? drawLitoral() : drawSerra(); }
+  function resizeScene(){
+    var dw = sceneCanvas.clientWidth;
+    sceneCanvas.width = dw; sceneCanvas.height = dw*(380/560);
+    renderScene();
+  }
+  window.addEventListener('resize', resizeScene);
+  setTimeout(resizeScene, 50);
+  renderScene();
+
+  var btnLitoral = document.getElementById('btnLitoral');
+  var btnSerra = document.getElementById('btnSerra');
+  var sceneCaption = document.getElementById('sceneCaption');
+  btnLitoral.addEventListener('click', function(){
+    currentScene='litoral'; renderScene();
+    btnLitoral.classList.add('active'); btnSerra.classList.remove('active');
+    sceneCaption.textContent = 'O litoral capixaba mistura praias, o Convento da Penha (1558) no alto de um morro em Vila Velha, e coqueiros à beira-mar.';
+  });
+  btnSerra.addEventListener('click', function(){
+    currentScene='serra'; renderScene();
+    btnSerra.classList.add('active'); btnLitoral.classList.remove('active');
+    sceneCaption.textContent = 'Na serra capixaba, cidades como Domingos Martins guardam casas de enxaimel erguidas por imigrantes europeus, perto de formações de pedra como a Pedra Azul.';
+  });
+
+  /* ============ FLIP CARDS ============ */
+  document.querySelectorAll('.flip-card').forEach(function(card){
+    card.addEventListener('click', function(){ this.classList.toggle('flipped'); });
+    card.setAttribute('tabindex','0'); card.setAttribute('role','button');
+    card.addEventListener('keydown', function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); this.classList.toggle('flipped'); }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
